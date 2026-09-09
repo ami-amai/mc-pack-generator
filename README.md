@@ -66,8 +66,8 @@
     * {version} = `metadata.version`
     * {format.min} = first `metadata.format`
     * {format.max} = second `metadata.format`
-    * {version.min} = min version of `{format.min}` pack_format (1.13 from example)
-    * {version.max} = max version of `{format.max}` pack_format (26.2 from example)
+    * {format_version.min} = min version of `{format.min}` pack_format (1.13 from example)
+    * {format_version.max} = max version of `{format.max}` pack_format (26.2 from example)
 
 ## Usage
 

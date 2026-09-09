@@ -53,8 +53,8 @@ class Pack(dict):
         "{author}": self.AUTHOR,
         "{format.min}": self.FORMAT[0],
         "{format.max}": self.FORMAT[1],
-        "{version.min}": self.FORMAT_VERSION[0],
-        "{version.max}": self.FORMAT_VERSION[1],
+        "{format_version.min}": self.FORMAT_VERSION[0],
+        "{format_version.max}": self.FORMAT_VERSION[1],
         }
 
         names = self.NAMEDATA
