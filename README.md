@@ -48,6 +48,7 @@
 * JSON can have many packs
 * JSON can use absolute and relative paths
 * Packs can have many files with their own arcnames and targets
+* Files has priority above pack.mcmeta and pack.png
 
 ### Placeholders
 
