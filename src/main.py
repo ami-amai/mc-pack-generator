@@ -43,12 +43,12 @@ def main():
                 for file in pack.FILES:
                     with zipfile.ZipFile(path.ARCHIVE(file["target"]), "w", zipfile.ZIP_DEFLATED) as archive:
 
-                        # Add file
-                        archive.write(path.SOURCE(file["source"]), file["arcname"])
-
                         # Add icon and mcmeta
                         archive.writestr("pack.mcmeta", pack.MCMETA)
                         archive.writestr("pack.png", pack.ICON)
+
+                        # Add file
+                        archive.write(path.SOURCE(file["source"]), file["arcname"])
 
                         # Extract files
                         EXTRACT = path.EXTRACT(file["target"])
