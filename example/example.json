@@ -1,0 +1,23 @@
+{
+    "example": {
+        "name": "Example pack",
+        "version": "1.0",
+        "icon": "./example/pack.png",
+        "metadata": {
+            "description": "This is example pack: {id}",
+            "author": "Ami_Amai",
+            "format": [ 87, 88 ],
+            "version": [ "26.2", "26.2" ]
+        },
+        "files": {
+            "./example/pack.png": {
+                "arcnames": [
+                    "assets/minecraft/textures/item/paper.png"
+                ],
+                "targets": [
+                    "{name}_{version}"
+                ]
+            }
+        }
+    }
+}
