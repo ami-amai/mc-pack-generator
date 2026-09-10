@@ -9,6 +9,20 @@ import shutil
 
 from pathlib import Path
 
+class MainPath(Pack):
+
+    def __init__(self, iterable):
+        self.OUTPUT = ROOT.get('output', iterable.META_AUTHOR, iterable.ID, iterable.VERSION)
+
+    def ARCHIVE (self, target: str):
+        return self.OUTPUT / f'{target}.zip'
+    
+    def EXTRACT (self, target: str):
+        return self.OUTPUT / target
+
+    def SOURCE (self, source: str):
+        return Path(source).resolve()
+
 def main():
 
     shutil.rmtree(ROOT.get('output'),ignore_errors=True)
@@ -16,22 +30,30 @@ def main():
     for i, arg in enumerate(sys.argv):
         if i != 0:
             data = utils.json_load(ROOT.get(arg))
-            for item in data.items():
-                item = Pack(item)
+            for pack in data.items():
 
-                output_path = ROOT.get('output', item.META_AUTHOR, item.ID, item.VERSION)
-                utils.mkdir(output_path)
+                # Get Pack() class
+                pack = Pack(pack)
 
-                for file in item.FILES:
-                    archive_path = output_path / f'{file["target"]}.zip'
-                    with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
-                        archive.write(Path(file["source"]).resolve(), file["arcname"])
-                        archive.writestr("pack.mcmeta", item.MCMETA)
-                        archive.writestr("pack.png", item.ICON)
+                # Get MainPath() class
+                path = MainPath(pack)
 
-                        extract_path = output_path / file["target"]
-                        utils.mkdir(extract_path)
-                        archive.extractall(extract_path)
+                utils.mkdir(path.OUTPUT)
+
+                for file in pack.FILES:
+                    with zipfile.ZipFile(path.ARCHIVE(file["target"]), "w", zipfile.ZIP_DEFLATED) as archive:
+
+                        # Add file
+                        archive.write(path.SOURCE(file["source"]), file["arcname"])
+
+                        # Add icon and mcmeta
+                        archive.writestr("pack.mcmeta", pack.MCMETA)
+                        archive.writestr("pack.png", pack.ICON)
+
+                        # Extract files
+                        EXTRACT = path.EXTRACT(file["target"])
+                        utils.mkdir(EXTRACT)
+                        archive.extractall(EXTRACT)
 
 if __name__ == "__main__":
     main()
