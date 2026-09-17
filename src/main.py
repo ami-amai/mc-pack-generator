@@ -1,59 +1,48 @@
 import utils
+
 from pack import Pack
-from utils import ROOT
+import os
 
 import sys
-import json
 import zipfile
-import shutil
 
 from pathlib import Path
 
-class MainPath(Pack):
-
-    def __init__(self, iterable):
-        self.OUTPUT = ROOT.get('output', iterable.META_AUTHOR, iterable.ID, iterable.VERSION)
-
-    def ARCHIVE (self, target: str):
-        return self.OUTPUT / f'{target}.zip'
-    
-    def EXTRACT (self, target: str):
-        return self.OUTPUT / target
-
-    def SOURCE (self, source: str):
-        return Path(source).resolve()
 
 def main():
 
-    shutil.rmtree(ROOT.get('output'),ignore_errors=True)
-
+    # Get all packs
     for i, arg in enumerate(sys.argv):
         if i != 0:
-            data = utils.json_load(ROOT.get(arg))
-            for pack in data.items():
+            # Get pack data
+            pack = Pack(Path(arg))
 
-                # Get Pack() class
-                pack = Pack(pack)
+            # Get pack files
+            files = pack.files.LIST.items()
 
-                # Get MainPath() class
-                path = MainPath(pack)
+            # Create archive and add files
+            for target, pairs in files:
+                zip_path = Path(f'{target}.zip')
 
-                utils.mkdir(path.OUTPUT)
+                # Create output path if not exists
+                if zip_path.parent.exists is False:
+                    utils.mkdir(zip_path.parent)
+                # Remove old archive if exists
+                if Path(zip_path).exists():
+                    os.remove(zip_path)
+                with zipfile.ZipFile(f'{target}.zip', "a", zipfile.ZIP_DEFLATED) as archive:
+                    # Add pack.mcmeta
+                    archive.writestr("pack.mcmeta", pack.MCMETA)
+                    for source, arcname in pairs:
 
-                for file in pack.FILES:
-                    with zipfile.ZipFile(path.ARCHIVE(file["target"]), "w", zipfile.ZIP_DEFLATED) as archive:
-
-                        # Add icon and mcmeta
-                        archive.writestr("pack.mcmeta", pack.MCMETA)
-                        archive.writestr("pack.png", pack.ICON)
-
-                        # Add file
-                        archive.write(path.SOURCE(file["source"]), file["arcname"])
-
-                        # Extract files
-                        EXTRACT = path.EXTRACT(file["target"])
-                        utils.mkdir(EXTRACT)
-                        archive.extractall(EXTRACT)
+                        # Add file if not in archive
+                        if arcname not in archive.namelist():
+                            # pack.png
+                            if arcname == "pack.png":
+                                archive.writestr(arcname, pack.icon(source))
+                            # file
+                            else:
+                                archive.write(source, arcname)
 
 if __name__ == "__main__":
     main()
