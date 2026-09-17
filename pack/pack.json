@@ -1,0 +1,14 @@
+{
+    "config": {
+        "pack.description": "Description",
+        "pack.author": "author",
+        "pack.format": [ 1, 88 ],
+        "my.name": "pack"
+    },
+    "files": {
+        "{pack.folder}/image.png": [
+            [ "pack.png" ],
+            [ "{pack.folder}/{my.name}" ]
+        ]
+    }
+}
