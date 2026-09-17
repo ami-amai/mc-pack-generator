@@ -1,131 +1,65 @@
-# Minecraft Pack Generator
+# Minecraft pack generator
 
-* My personal python script for generation resourcepacks and datapacks
+* This is python script for generating resourcepacks and datapacks with special JSON
 
-## Content
+## JSON
 
-* Description
-* JSON structure
-    * Template
-    * Placeholders
-    * Example
-* Usage
-
-## Description
-
-* This generator uses JSON files for generating packs from sources
-* You need to get or create special JSON for using this script
-
-## JSON Structure
-
-### Template:
-
-```json
-{
-    "id": {
-        "name": "Pack name",
-        "version": "Pack version",
-        "icon": "<path_to_icon>",
-        "metadata": {
-            "description": "Description",
-            "author": "Username",
-            "format": [ 0, 88 ],
-            "version": [ "1.0", "26.2" ]
-        },
-        "files": {
-            "<path_to_file>": {
-                "arcnames": [
-                    "<path_inside_archive>",
-                ],
-                "targets": [
-                    "<name_of_archive>"
-                ]
-            }
-        }
-    }
-}
-```
-* JSON can have many packs
-* JSON can use absolute and relative paths
-* Packs can have many files with their own arcnames and targets
-* Files has priority above pack.mcmeta and pack.png
-
-### Placeholders
-
-* Some values have placeholders:
-    * `id.name`
-    * `id.version`
-    * `id.metadata.description`
-    * `id.metadata.author`
-    * `id.files.<file>.targets.<target>`
-
-* Placeholders:
-    * {id} - `id`
-    * {name} - `id.name`
-    * {version} - `id.version`
-    * {meta.author} - `id.metadata.author`
-    * {meta.format.min} - `id.metadata.format[0]`
-    * {meta.format.max} - `id.metadata.format[1]`
-    * {meta.version.min} - `id.metadata.version[0]`
-    * {meta.version.max} - `id.metadata.version[1]`
-
-*P.s - Recursion can break pack*
+* For using generator you need to get or create json file
 
 ### Example
 
 ```json
 {
-    "example": {
-        "name": "Example pack",
-        "version": "1.0",
-        "icon": "./example/pack.png",
-        "metadata": {
-            "description": "This is example pack: {id}",
-            "author": "Ami_Amai",
-            "format": [ 87, 88 ],
-            "version": [ "26.2", "26.2" ]
-        },
-        "files": {
-            "./example/pack.png": {
-                "arcnames": [
-                    "assets/minecraft/textures/item/paper.png"
-                ],
-                "targets": [
-                    "{name}_{version}"
-                ]
-            }
-        }
+    "config": {
+        "pack.description": "Description",
+        "pack.author": "author",
+        "pack.format": [ 1, 88 ],
+        "my.name": "pack"
+    },
+    "files": {
+        "{pack.folder}/image.png": [
+            [ "pack.png" ],
+            [ "{pack.folder}/{my.name}" ]
+        ]
     }
 }
 ```
 
-* Example will create `./output/Ami_Amai/example/1.0/Exmple pack_1.0.zip` with:
-    * `pack.mcmeta`
-        * `pack_format = 87`
-        * description:
-            * `This is example pack: example`
-            * `Ami_Amai`
-        * `supported_formats = [87, 88]`
-    * `pack.png` from `./example/pack.png` with 128x128 size
-    * `assets/minecraft/textures/item/paper.png` from `./example/pack.png`
-* Also example will create extracted archive inside `./output/Ami_Amai/example/1.0/Exmple pack_1.0`
+* `config` contains some usable variables, you can create your vars
+    * You can use them with {key} or {key:index} if list
+    * If {key} is list - current value will be split to all possible variants
+    * Special variables:
+        * `pack.description` - description inside pack.mcmeta, the first row
+        * `pack.author` - description inside pack.mcmeta, "by {pack.author}", the second row
+        * `pack.format` - `[ min, max ]`, pack_format inside pack.mcmeta
+        * `pack.folder` - returns absolute path to this json, if not overrided
+* `files` contains information about files
+    * Structure -
+        ```json
+        "path_to_source": [ [ "paths_inside_archive" ], [ "paths_to_archives" ] ]
+        ```
+    * Any source can be placed in a few archives with a few names inside
 
 ## Usage
 
-1. Create VENV inside repository
-
+1. Create VENV with python:
 ```bash
-python -m venv .venv
+pythom -m venv .venv/
 ```
 
-2. Install requirements inside .venv
-
+2. Activate VENV:
 ```bash
-.venv/bin/pip -r requirements
+source .venv/bin/activate
 ```
 
-3. Launch script with selected JSON
-
+3. Install requirements:
 ```bash
-.venv/bin/python src/main.py <file1> <file2> ...
+.venv/bin/pip install -r src/requirements.txt
 ```
+
+4. Use script with file path as argument:
+```bash
+.venv/bin/python src/main.py pack/pack.json
+```
+
+* All packs will be created as archives
